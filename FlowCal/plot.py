@@ -3210,7 +3210,7 @@ def density2d(data,
         plt.savefig(savefig, dpi=savefig_dpi)
         plt.close()
 
-def scatter2d(data_list, 
+def scatter2d(data_list, ax=None,
               channels=[0,1],
               xscale='logicle',
               yscale='logicle',
@@ -3269,6 +3269,9 @@ def scatter2d(data_list,
     passed directly to ``plt.scatter``.
 
     """
+    # Check if a specific ax is given
+    ax = plt.gca()
+
     # Check appropriate number of channels
     if len(channels) != 2:
         raise ValueError('two channels need to be specified')
@@ -3292,30 +3295,28 @@ def scatter2d(data_list,
         # Make scatter plot
         plt.scatter(data_plot[:,0],
                     data_plot[:,1],
-                    s=5,
-                    alpha=0.25,
                     color=color[i],
                     **kwargs)
 
     # Set labels if specified, else try to extract channel names
     if xlabel is not None:
-        plt.xlabel(xlabel)
+        ax.set_xlabel(xlabel)
     elif hasattr(data_plot, 'channels'):
-        plt.xlabel(data_plot.channels[0])
+        ax.set_xlabel(data_plot.channels[0])
     if ylabel is not None:
-        plt.ylabel(ylabel)
+        ax.set_ylabel(ylabel)
     elif hasattr(data_plot, 'channels'):
-        plt.ylabel(data_plot.channels[1])
+        ax.set_ylabel(data_plot.channels[1])
 
     # Set scale of axes
     if xscale=='logicle':
-        plt.gca().set_xscale(xscale, data=data_list, channel=channels[0])
+        ax.set_xscale(xscale, data=data_list, channel=channels[0])
     else:
-        plt.gca().set_xscale(xscale)
+        ax.set_xscale(xscale)
     if yscale=='logicle':
-        plt.gca().set_yscale(yscale, data=data_list, channel=channels[1])
+        ax.set_yscale(yscale, data=data_list, channel=channels[1])
     else:
-        plt.gca().set_yscale(yscale)
+        ax.set_yscale(yscale)
 
     # Set plot limits if specified, else extract range from data_list.
     # ``.hist_bins`` with one bin works better for visualization that
@@ -3335,7 +3336,7 @@ def scatter2d(data_list,
                                            scale=xscale)
                 xlim[0] = xlim_data[0] if xlim_data[0] < xlim[0] else xlim[0]
                 xlim[1] = xlim_data[1] if xlim_data[1] > xlim[1] else xlim[1]
-    plt.xlim(xlim)
+    ax.set_xlim(xlim)
     if ylim is None:
         ylim = [np.inf, -np.inf]
         for data in data_list:
@@ -3346,11 +3347,11 @@ def scatter2d(data_list,
                                            scale=yscale)
                 ylim[0] = ylim_data[0] if ylim_data[0] < ylim[0] else ylim[0]
                 ylim[1] = ylim_data[1] if ylim_data[1] > ylim[1] else ylim[1]
-    plt.ylim(ylim)
+    ax.set_ylim(ylim)
 
     # Title
     if title is not None:
-        plt.title(title)
+        ax.set_title(title)
 
     # Save if necessary
     if savefig is not None:
