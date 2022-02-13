@@ -1047,7 +1047,7 @@ matplotlib.scale.register_scale(_LogicleScale)
 # SIMPLE PLOT FUNCTIONS
 ###
 
-def hist1d(data_list,
+def hist1d(data_list, ax=None,
            channel=0,
            xscale='logicle',
            bins=256,
@@ -1154,6 +1154,11 @@ def hist1d(data_list,
     using matplotlib 2.1.0 if `normed_area` is expected to be used.
 
     """
+    # Use the current axis if no axis specified
+
+    if not ax:
+        ax = plt.gca()
+
     # Using `normed_area` with matplotlib 2.1.0 causes an incorrect plot to be
     # produced. Raise warning in these conditions.
     if normed_area and packaging.version.parse(matplotlib.__version__) \
@@ -1245,13 +1250,13 @@ def hist1d(data_list,
         hist_kwargs['edgecolor'] = edgecolor[i]
 
         # Plot
-        n, edges, patches = plt.hist(**hist_kwargs)
+        n, edges, patches = ax.hist(**hist_kwargs)
 
     # Set scale of x axis
     if xscale=='logicle':
-        plt.gca().set_xscale(xscale, data=data_list, channel=channel)
+        ax.set_xscale(xscale, data=data_list, channel=channel)
     else:
-        plt.gca().set_xscale(xscale)
+        ax.set_xscale(xscale)
 
     ###
     # Final configuration
@@ -1260,42 +1265,42 @@ def hist1d(data_list,
     # x and y labels
     if xlabel is not None:
         # Highest priority is user-provided label
-        plt.xlabel(xlabel)
+        ax.set_xlabel(xlabel)
     elif hasattr(hist_kwargs['x'], 'channels'):
         # Attempt to use channel name
-        plt.xlabel(hist_kwargs['x'].channels[0])
+        ax.set_xlabel(hist_kwargs['x'].channels[0])
 
     if ylabel is not None:
         # Highest priority is user-provided label
-        plt.ylabel(ylabel)
+        ax.set_ylabel(ylabel)
     elif normed_area:
-        plt.ylabel('Probability')
+        ax.set_ylabel('Probability')
     elif normed_height:
-        plt.ylabel('Counts (normalized)')
+        ax.set_ylabel('Counts (normalized)')
     else:
         # Default is "Counts"
-        plt.ylabel('Counts')
+        ax.set_ylabel('Counts')
 
     # x and y limits
     if xlim is not None:
         # Highest priority is user-provided limits
-        plt.xlim(xlim)
+        ax.set_xlim(xlim)
     elif bins is not None:
         # Use bins if specified
-        plt.xlim((edges[0], edges[-1]))
+        ax.set_xlim((edges[0], edges[-1]))
 
     if ylim is not None:
-        plt.ylim(ylim)
+        ax.set_ylim(ylim)
 
     # Title
     if title is not None:
-        plt.title(title)
+        ax.set_title(title)
 
     # Legend
     if legend:
         if legend_labels is None:
             legend_labels = [str(data) for data in data_list]
-        plt.legend(legend_labels,
+        ax.legend(legend_labels,
                    loc=legend_loc,
                    prop={'size': legend_fontsize})
 
